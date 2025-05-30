@@ -1,13 +1,16 @@
 package main;
 
+import piece.PieceManager;
 import tile.TileManager;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 
-public class GamePanel extends JPanel implements Runnable{
+public class GamePanel extends JPanel implements Runnable, MouseListener {
     // SCREEN SETTINGS
-    final int originalTileSize = 60;
+    final int originalTileSize = 50;
     final double scale = 1.2;
 
     public final int tileSize = (int) (originalTileSize * scale);
@@ -20,12 +23,14 @@ public class GamePanel extends JPanel implements Runnable{
 
     Thread gameThread;
     TileManager tileM = new TileManager(this);
+    PieceManager pieceM = new PieceManager(this);
 
     public GamePanel(){
         this.setPreferredSize(new Dimension(screenWidth, screenHeight));
         this.setBackground(Color.BLACK);
         this.setDoubleBuffered(true);
         this.setFocusable(true);
+        this.addMouseListener(this);
     }
 
     public void startGameThread() {
@@ -58,7 +63,7 @@ public class GamePanel extends JPanel implements Runnable{
             }
 
             if(timer >=  1000000000) {
-                System.out.println("FPS: " + drawCount);
+//                System.out.println("FPS: " + drawCount);
                 drawCount = 0;
                 timer = 0;
             }
@@ -71,9 +76,47 @@ public class GamePanel extends JPanel implements Runnable{
         Graphics2D g2 = (Graphics2D) g;
 
         tileM.draw(g2);
-//        player.draw(g2);
+        pieceM.draw(g2);
+
 
         g2.dispose();
 
     }
+
+    public int getTileSize() {
+        return tileSize;
+    }
+
+    @Override
+    public void mouseClicked(MouseEvent e) {
+        Point p = e.getPoint();
+        if (pieceM.isPieceSelected(p)) {
+            tileM.pieceSelected(p);
+        }
+        else {
+            tileM.setPieceSelected(false);
+        }
+    }
+
+    @Override
+    public void mousePressed(MouseEvent e) {
+
+    }
+
+    @Override
+    public void mouseReleased(MouseEvent e) {
+
+    }
+
+    @Override
+    public void mouseEntered(MouseEvent e) {
+
+    }
+
+    @Override
+    public void mouseExited(MouseEvent e) {
+
+    }
+
+
 }

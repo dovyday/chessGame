@@ -12,6 +12,9 @@ public class TileManager {
     GamePanel gp;
     public int[][] mapTileNum;
     public Tile[] tile;
+    static int tileSize;
+    boolean pieceSelected = false;
+    Point pieceLocation;
 
     public TileManager(GamePanel gp) {
         this.gp = gp;
@@ -19,6 +22,7 @@ public class TileManager {
         tile = new Tile[2];
         loadMap("/board/map.txt");
         loadTiles();
+        tileSize = gp.getTileSize();
     }
 
     public void loadTiles() {
@@ -75,6 +79,46 @@ public class TileManager {
                 }
             }
         }
+        if (pieceSelected) {
+            g2.setColor(new Color(255, 223, 93));
+            g2.fillRect(getRowFromPoint(pieceLocation) * tileSize, getColFromPoint(pieceLocation) * tileSize, gp.tileSize, gp.tileSize);
+        }
+    }
+
+
+
+    public int getRowFromPoint(Point p) {
+        return (int) p.x / tileSize;
+    }
+
+    public int getColFromPoint(Point p) {
+        return (int) p.y / tileSize;
+    }
+    public void setPieceSelected(boolean selected) {
+        this.pieceSelected = selected;
+    }
+    public boolean isPieceSelected() {
+        return pieceSelected;
+    }
+    public void getPoint(Point p) {
+        this.pieceLocation = p;
+    }
+
+    public void pieceSelected(Point p) {
+        setPieceSelected(true);
+        if (pieceLocation == null) {
+            pieceLocation = p;
+            System.out.println("pieceLocation was null");
+        }
+        else if(!checkIfTheSamePiece(p)) {
+            pieceLocation = p;
+            System.out.println("paspaude ant kito pieco kol active sitas");
+        }
+
+
+    }
+    public boolean checkIfTheSamePiece(Point newPoint) {
+        return getRowFromPoint(pieceLocation) == getRowFromPoint(newPoint) && getColFromPoint(pieceLocation) == getColFromPoint(newPoint);
     }
 
 }
