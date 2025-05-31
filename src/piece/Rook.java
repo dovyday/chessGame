@@ -1,8 +1,16 @@
 package piece;
 
+import main.GamePanel;
+
+import java.awt.*;
+
 public class Rook extends Piece {
-    public Rook(int row, int col, String color) {
-        super(row, col, color);
+    public Rook(int row, int col, String color, GamePanel gamePanel) {
+        super(row, col, color, gamePanel);
+    }
+
+    public void drawMoves(Graphics2D g2) {
+
     }
 
 }

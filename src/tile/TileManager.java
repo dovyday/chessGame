@@ -1,6 +1,7 @@
 package tile;
 
 import main.GamePanel;
+import piece.PieceManager;
 
 import java.awt.*;
 import java.io.BufferedReader;
@@ -15,14 +16,16 @@ public class TileManager {
     static int tileSize;
     boolean pieceSelected = false;
     Point pieceLocation;
+    PieceManager pieceM;
 
-    public TileManager(GamePanel gp) {
+    public TileManager(GamePanel gp, PieceManager pieceM) {
         this.gp = gp;
-        mapTileNum = new int[gp.maxScreenCol][gp.maxScreenRow];
+        mapTileNum = new int[gp.maxScreenRow][gp.maxScreenCol];
         tile = new Tile[2];
         loadMap("/board/map.txt");
         loadTiles();
         tileSize = gp.getTileSize();
+        this.pieceM = pieceM;
     }
 
     public void loadTiles() {
@@ -33,31 +36,22 @@ public class TileManager {
     }
 
     public void loadMap(String mapPath) {
-
         try {
-            InputStream is = getClass().getResourceAsStream(mapPath);
+            InputStream is  = getClass().getResourceAsStream(mapPath);
             BufferedReader br = new BufferedReader(new InputStreamReader(is));
 
-            int col = 0, row = 0;
-
-            while (col < gp.maxScreenCol && row < gp.maxScreenRow) {
+            int row = 0;
+            while (row < gp.maxScreenRow) {
                 String line = br.readLine();
+                String[] numbers = line.split(" ");
 
-                while (col < gp.maxScreenCol) {
-                    String[] numbers = line.split(" ");
-
+                for (int col = 0; col < gp.maxScreenCol; col++) {
                     int num = Integer.parseInt(numbers[col]);
-
-                    mapTileNum[col][row] = num;
-                    col++;
+                    mapTileNum[row][col] = num;
                 }
-                if (col == gp.maxScreenCol) {
-                    col = 0;
-                    row++;
-                }
+                row++;
             }
             br.close();
-
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -68,7 +62,7 @@ public class TileManager {
         for(int row = 0; row < gp.maxScreenRow; row++) {
             for(int col = 0; col < gp.maxScreenCol; col++) {
                 int tileNum = mapTileNum[row][col]; // Note: row first
-                if(tileNum >= 0 && tileNum < gp.tileSize && tile[tileNum] != null) {
+                if(tileNum >= 0 && tileNum < tile.length && tile[tileNum] != null) {
                     g2.setColor(tile[tileNum].getColor());
                     g2.fillRect(
                             col * gp.tileSize,
@@ -81,18 +75,20 @@ public class TileManager {
         }
         if (pieceSelected) {
             g2.setColor(new Color(255, 223, 93));
-            g2.fillRect(getRowFromPoint(pieceLocation) * tileSize, getColFromPoint(pieceLocation) * tileSize, gp.tileSize, gp.tileSize);
+            g2.fillRect(getColFromPoint(pieceLocation) * tileSize, getRowFromPoint(pieceLocation) * tileSize, gp.tileSize, gp.tileSize);
+            pieceM.drawPieceMoves(g2, pieceLocation);
+
         }
     }
 
 
 
     public int getRowFromPoint(Point p) {
-        return (int) p.x / tileSize;
+        return (int) p.y / tileSize;
     }
 
     public int getColFromPoint(Point p) {
-        return (int) p.y / tileSize;
+        return (int) p.x / tileSize;
     }
     public void setPieceSelected(boolean selected) {
         this.pieceSelected = selected;
@@ -109,10 +105,13 @@ public class TileManager {
         if (pieceLocation == null) {
             pieceLocation = p;
             System.out.println("pieceLocation was null");
-        }
-        else if(!checkIfTheSamePiece(p)) {
+        } else if(!checkIfTheSamePiece(p)) {
             pieceLocation = p;
             System.out.println("paspaude ant kito pieco kol active sitas");
+        } else if (checkIfTheSamePiece(p)) {
+          setPieceSelected(false);
+          System.out.println("piece unselected");
+          pieceLocation = null;
         }
 
 

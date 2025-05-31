@@ -22,8 +22,8 @@ public class GamePanel extends JPanel implements Runnable, MouseListener {
     int FPS = 60;
 
     Thread gameThread;
-    TileManager tileM = new TileManager(this);
     PieceManager pieceM = new PieceManager(this);
+    TileManager tileM = new TileManager(this, pieceM);
 
     public GamePanel(){
         this.setPreferredSize(new Dimension(screenWidth, screenHeight));
@@ -74,6 +74,8 @@ public class GamePanel extends JPanel implements Runnable, MouseListener {
         super.paintComponent(g);
 
         Graphics2D g2 = (Graphics2D) g;
+
+        g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
         tileM.draw(g2);
         pieceM.draw(g2);
