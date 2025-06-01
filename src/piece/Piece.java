@@ -6,6 +6,7 @@ import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Objects;
 
 
@@ -23,7 +24,7 @@ public abstract class Piece {
         this.col = col;
         this.color = color;
         this.gamePanel = gamePanel;
-        legalMoves = new boolean[row][col];
+        legalMoves = new boolean[gamePanel.maxScreenRow][gamePanel.maxScreenCol];
         initImage();
     }
 
@@ -37,7 +38,16 @@ public abstract class Piece {
         }
     }
 
-    abstract void drawMoves(Graphics2D g2);
+    public void drawMoves(Graphics2D g2, int[][] occupiedSquares) {
+        computeLegalMoves(occupiedSquares);
+        for (int i = 0; i < legalMoves.length; i++) {
+            for (int j = 0; j < legalMoves.length; j++) {
+                if (legalMoves[i][j]) {
+                    drawDot(g2, i, j);
+                }
+            }
+        }
+    }
 
     void drawDot(Graphics2D g2, int boardRow, int boardCol) {
         int ts = gamePanel.getTileSize();
@@ -58,8 +68,53 @@ public abstract class Piece {
         g2.fillOval(cx - radius, cy - radius, diameter, diameter);
 
     }
-    public void computeLegalMoves(boolean[][] occupiedSquares) {
+    abstract void computeLegalMoves(int[][] occupiedSquares);
 
+    public void fillWithZeros() {
+        for (boolean[] legalMove : legalMoves) {
+            Arrays.fill(legalMove, false);
+        }
+    }
+
+    public int checkLegalMoves(int[][] occupiedSquares, int row, int col) {
+        if (occupiedSquares[row][col] == 0) {
+            legalMoves[row][col] = true;
+        } else if (occupiedSquares[row][col] == 1 && Objects.equals(this.color, "W")) { // white piece into white piece
+            legalMoves[row][col] = false;
+            return -1;
+        } else if (occupiedSquares[row][col] == 1 && Objects.equals(this.color, "B")) { // black piece into white piece
+            legalMoves[row][col] = true;
+            return -1;
+        } else if (occupiedSquares[row][col] == 2 && Objects.equals(this.color, "W")) { // white piece into black piece
+            legalMoves[row][col] = true;
+            return -1;
+        } else if (occupiedSquares[row][col] == 2 && Objects.equals(this.color, "B")) { // black piece into black piece
+            legalMoves[row][col] = false;
+            return -1;
+        }
+        return 0;
+    }
+
+    public boolean isRowColWithinBounds(int row, int col) {
+        if (row < 0 || row >= gamePanel.maxScreenRow) {
+            return false;
+        }
+        if (col < 0 || col >= gamePanel.maxScreenCol) {
+            return false;
+        }
+        return true;
+    }
+
+    public boolean isLegalMove(int col, int row) {
+        if(legalMoves[row][col]) {
+            return true;
+        }
+        return false;
+    }
+
+    public void movePieceLocation(int col, int row) {
+        this.row = row;
+        this.col = col;
     }
 
 

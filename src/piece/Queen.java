@@ -9,7 +9,37 @@ public class Queen extends Piece {
         super(row, col, color, gamePanel);
     }
 
-    public void drawMoves(Graphics2D g2) {
+    @Override
+    void computeLegalMoves(int[][] occupiedSquares) {
+        fillWithZeros();         // clear any previous marks
 
+        int r = row;
+        int c = col;
+
+
+        int[] dr = { -1, +1,  0,  0,  -1, -1, +1, +1 };
+        int[] dc = {  0,  0, -1, +1,  -1, +1, -1, +1 };
+
+
+        for (int d = 0; d < 8; d++) {
+            int step = 1;
+            while (true) {
+                int nr = r + dr[d] * step;
+                int nc = c + dc[d] * step;
+
+                if (!isRowColWithinBounds(nr, nc)) {
+                    break;
+                }
+
+                int stopSignal = checkLegalMoves(occupiedSquares, nr, nc);
+                if (stopSignal == -1) {
+                    break;
+                }
+
+                step++;
+            }
+        }
     }
+
+
 }

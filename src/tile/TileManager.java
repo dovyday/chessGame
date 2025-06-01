@@ -58,11 +58,11 @@ public class TileManager {
 
     }
 
-    public void draw(Graphics2D g2) {
-        for(int row = 0; row < gp.maxScreenRow; row++) {
-            for(int col = 0; col < gp.maxScreenCol; col++) {
-                int tileNum = mapTileNum[row][col]; // Note: row first
-                if(tileNum >= 0 && tileNum < tile.length && tile[tileNum] != null) {
+    public void drawBoardOnly(Graphics2D g2) {
+        for (int row = 0; row < gp.maxScreenRow; row++) {
+            for (int col = 0; col < gp.maxScreenCol; col++) {
+                int tileNum = mapTileNum[row][col];
+                if (tileNum >= 0 && tileNum < tile.length && tile[tileNum] != null) {
                     g2.setColor(tile[tileNum].getColor());
                     g2.fillRect(
                             col * gp.tileSize,
@@ -73,20 +73,26 @@ public class TileManager {
                 }
             }
         }
-        if (pieceSelected) {
-            g2.setColor(new Color(255, 223, 93));
-            g2.fillRect(getColFromPoint(pieceLocation) * tileSize, getRowFromPoint(pieceLocation) * tileSize, gp.tileSize, gp.tileSize);
-            pieceM.drawPieceMoves(g2, pieceLocation);
-
-        }
     }
 
+    public void drawHighlight(Graphics2D g2) {
+        if (!pieceSelected) return;
+
+        g2.setColor(new Color(255, 223, 93));
+        g2.fillRect(getColFromPoint(pieceLocation) * tileSize, getRowFromPoint(pieceLocation) * tileSize, gp.tileSize, gp.tileSize);
+
+    }
+
+    public void drawMove(Graphics2D g2) {
+        if (!pieceSelected) return;
+
+        pieceM.drawPieceMoves(g2, pieceLocation);
+    }
 
 
     public int getRowFromPoint(Point p) {
         return (int) p.y / tileSize;
     }
-
     public int getColFromPoint(Point p) {
         return (int) p.x / tileSize;
     }
@@ -96,9 +102,7 @@ public class TileManager {
     public boolean isPieceSelected() {
         return pieceSelected;
     }
-    public void getPoint(Point p) {
-        this.pieceLocation = p;
-    }
+    public Point getPoint() { return this.pieceLocation; }
 
     public void pieceSelected(Point p) {
         setPieceSelected(true);
@@ -119,5 +123,7 @@ public class TileManager {
     public boolean checkIfTheSamePiece(Point newPoint) {
         return getRowFromPoint(pieceLocation) == getRowFromPoint(newPoint) && getColFromPoint(pieceLocation) == getColFromPoint(newPoint);
     }
+
+
 
 }

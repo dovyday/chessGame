@@ -2,7 +2,6 @@ package piece;
 
 import main.GamePanel;
 
-import java.awt.*;
 
 public class King extends Piece {
 
@@ -10,7 +9,21 @@ public class King extends Piece {
         super(row, col, color, gamePanel);
     }
 
-    public void drawMoves(Graphics2D g2) {
+    @Override
+    void computeLegalMoves(int[][] occupiedSquares) {
+        fillWithZeros();
+        int r = row;
+        int c = col;
 
+        int[] dr = { -1, -1, -1,  0,  0,  1,  1,  1 };
+        int[] dc = { -1,  0,  1, -1,  1, -1,  0,  1 };
+
+        for (int i = 0; i < 8; i++) {
+            int nr = r + dr[i];
+            int nc = c + dc[i];
+            if (isRowColWithinBounds(nr, nc)) {
+                checkLegalMoves(occupiedSquares, nr, nc);
+            }
+        }
     }
 }

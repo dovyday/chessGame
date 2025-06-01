@@ -1,5 +1,7 @@
 package main;
 
+import piece.MoveManager;
+import piece.Piece;
 import piece.PieceManager;
 import tile.TileManager;
 
@@ -24,6 +26,7 @@ public class GamePanel extends JPanel implements Runnable, MouseListener {
     Thread gameThread;
     PieceManager pieceM = new PieceManager(this);
     TileManager tileM = new TileManager(this, pieceM);
+    MoveManager moveM = new MoveManager(this, tileM, pieceM);
 
     public GamePanel(){
         this.setPreferredSize(new Dimension(screenWidth, screenHeight));
@@ -77,8 +80,13 @@ public class GamePanel extends JPanel implements Runnable, MouseListener {
 
         g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
-        tileM.draw(g2);
+        tileM.drawBoardOnly(g2);
+
+        tileM.drawHighlight(g2);
+
         pieceM.draw(g2);
+
+        tileM.drawMove(g2);
 
 
         g2.dispose();
@@ -91,11 +99,32 @@ public class GamePanel extends JPanel implements Runnable, MouseListener {
 
     @Override
     public void mouseClicked(MouseEvent e) {
-        Point p = e.getPoint();
-        if (pieceM.isPieceSelected(p)) {
-            tileM.pieceSelected(p);
+        Point clickPoint = e.getPoint();
+        Piece clickedPiece = pieceM.getPieceFromLocation(clickPoint);
+
+        // Case 1: No piece is selected yet
+        if (! tileM.isPieceSelected()) {
+            if (clickedPiece != null) {
+                // We clicked on a piece → select it
+                tileM.pieceSelected(clickPoint);
+            }
+            // else: clicked on empty square while no piece is selected → do nothing
+            return;
+        }
+
+        // Case 2: A piece is already selected
+        // “currentlySelectedPoint” is the location of the piece we had selected before
+        Point currentlySelectedPoint = tileM.getPoint();
+
+        if (clickedPiece != null) {
+            // We clicked on another piece (or the same one):
+            // Let TileManager.pieceSelected(...) handle toggling or switching
+            tileM.pieceSelected(clickPoint);
         }
         else {
+            // We clicked on an empty square → attempt to move the previously selected piece
+            moveM.movePiece(clickPoint);
+            // In any case, clear the selection after attempting the move:
             tileM.setPieceSelected(false);
         }
     }

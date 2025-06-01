@@ -25,12 +25,12 @@ public class PieceManager {
     public void initPieces() {
         pieceList.add(new Rook(7, 0, "W", gamePanel));   // bottom-left corner
         pieceList.add(new Knight(7, 1, "W", gamePanel));
-        pieceList.add(new Bishop(7, 2, "W", gamePanel));
-        pieceList.add(new Queen(7, 3, "W", gamePanel));
-        pieceList.add(new King(7, 4, "W", gamePanel));
+        pieceList.add(new Bishop(7, 2, "W", gamePanel)); // 7 2
+        pieceList.add(new Queen(7, 3, "W", gamePanel));  // 7 3
+        pieceList.add(new King(7, 4, "W", gamePanel)); // 7 4
         pieceList.add(new Bishop(7, 5, "W", gamePanel));
-        pieceList.add(new Knight(7, 6, "W", gamePanel));
-        pieceList.add(new Rook(7, 7, "W", gamePanel));   // bottom-right corner
+        pieceList.add(new Knight(7, 6, "W", gamePanel)); // 7 6
+        pieceList.add(new Rook(7, 7, "W", gamePanel));   // bottom-right corner 7 7
 
         // ── White pawns on row 6 ─────────────────────────────────────
         for (int col = 0; col < 8; col++) {
@@ -77,7 +77,8 @@ public class PieceManager {
         if (selectedPiece == null) {
             System.out.println("Piece Not found");
         }
-        selectedPiece.drawMoves(g2);
+        rebuildOccupied();
+        selectedPiece.drawMoves(g2, this.occupiedSquares);
 
     }
     public Piece getPieceFromLocation(Point pieceLocation) {
@@ -105,6 +106,8 @@ public class PieceManager {
             }
         }
     }
+
+
 
 
 }
